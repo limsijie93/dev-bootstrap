@@ -1,0 +1,8 @@
+# Ignore Ansible runtime artifacts
+*.retry
+.ansible/
+__pycache__/
+*.pyc
+
+# Local inventory overrides (optional)
+inventory/hosts.local.yml

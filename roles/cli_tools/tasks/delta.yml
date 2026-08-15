@@ -1,0 +1,38 @@
+---
+- name: Ensure delta extract directory exists
+  ansible.builtin.file:
+    path: /tmp/delta_extract
+    state: directory
+    mode: "0755"
+
+- name: Download git-delta archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/dandavison/delta/releases/download/{{ delta_version }}/delta-{{ delta_version }}-{{ cli_arch_gnu }}-unknown-linux-gnu.tar.gz
+    dest: /tmp/delta.tar.gz
+    mode: "0644"
+
+- name: Unpack git-delta archive
+  ansible.builtin.unarchive:
+    src: /tmp/delta.tar.gz
+    dest: /tmp/delta_extract
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+
+- name: Install delta binary
+  ansible.builtin.copy:
+    src: /tmp/delta_extract/delta
+    dest: "{{ cli_install_dir }}/delta"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup delta temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/delta.tar.gz
+    - /tmp/delta_extract

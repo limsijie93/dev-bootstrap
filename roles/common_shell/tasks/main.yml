@@ -1,0 +1,49 @@
+---
+- name: Ensure bashrc exists
+  ansible.builtin.file:
+    path: "{{ bootstrap_home }}/.bashrc"
+    state: touch
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+
+- name: Render bash productivity snippet
+  ansible.builtin.set_fact:
+    shell_name: bash
+
+- name: Install bash productivity snippet
+  ansible.builtin.blockinfile:
+    path: "{{ bootstrap_home }}/.bashrc"
+    marker: "# {mark} DEV-BOOTSTRAP MANAGED BLOCK"
+    create: true
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0644"
+    block: "{{ lookup('template', 'shell_snippet.sh.j2') }}"
+
+- name: Check whether zshrc already exists
+  ansible.builtin.stat:
+    path: "{{ bootstrap_home }}/.zshrc"
+  register: zshrc_stat
+
+- name: Detect login shell for bootstrap user
+  ansible.builtin.set_fact:
+    bootstrap_login_shell: "{{ ansible_facts.getent_passwd[bootstrap_user][6] | default('') }}"
+
+- name: Render zsh productivity snippet
+  ansible.builtin.set_fact:
+    shell_name: zsh
+  when: zshrc_stat.stat.exists or ('zsh' in bootstrap_login_shell)
+
+- name: Install zsh productivity snippet
+  ansible.builtin.blockinfile:
+    path: "{{ bootstrap_home }}/.zshrc"
+    marker: "# {mark} DEV-BOOTSTRAP MANAGED BLOCK"
+    create: true
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0644"
+    block: "{{ lookup('template', 'shell_snippet.sh.j2') }}"
+  when: zshrc_stat.stat.exists or ('zsh' in bootstrap_login_shell)

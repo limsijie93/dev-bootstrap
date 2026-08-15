@@ -1,0 +1,36 @@
+---
+- name: Ensure duf extract directory exists
+  ansible.builtin.file:
+    path: /tmp/duf_extract
+    state: directory
+    mode: "0755"
+
+- name: Download duf archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/muesli/duf/releases/download/v{{ duf_version }}/duf_{{ duf_version }}_linux_{{ cli_arch_asset }}.tar.gz
+    dest: /tmp/duf.tar.gz
+    mode: "0644"
+
+- name: Unpack duf archive
+  ansible.builtin.unarchive:
+    src: /tmp/duf.tar.gz
+    dest: /tmp/duf_extract
+    remote_src: true
+
+- name: Install duf binary
+  ansible.builtin.copy:
+    src: /tmp/duf_extract/duf
+    dest: "{{ cli_install_dir }}/duf"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup duf temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/duf.tar.gz
+    - /tmp/duf_extract

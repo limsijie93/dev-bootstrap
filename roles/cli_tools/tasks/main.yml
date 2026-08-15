@@ -1,0 +1,62 @@
+---
+- name: Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - wget
+      - unzip
+      - tar
+      - gzip
+      - git
+      - python3
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install apt-backed CLI tools
+  ansible.builtin.include_tasks: apt_packages.yml
+
+- name: Install eza
+  ansible.builtin.include_tasks: eza.yml
+  when: install_eza | bool
+
+- name: Install zoxide
+  ansible.builtin.include_tasks: zoxide.yml
+  when: install_zoxide | bool
+
+- name: Install git-delta
+  ansible.builtin.include_tasks: delta.yml
+  when: install_delta | bool
+
+- name: Install yq
+  ansible.builtin.include_tasks: yq.yml
+  when: install_yq | bool
+
+- name: Install btop
+  ansible.builtin.include_tasks: btop.yml
+  when: install_btop | bool
+
+- name: Install lazygit
+  ansible.builtin.include_tasks: lazygit.yml
+  when: install_lazygit | bool
+
+- name: Install duf
+  ansible.builtin.include_tasks: duf.yml
+  when: install_duf | bool
+
+- name: Install dust
+  ansible.builtin.include_tasks: dust.yml
+  when: install_dust | bool
+
+- name: Install tealdeer
+  ansible.builtin.include_tasks: tealdeer.yml
+  when: install_tealdeer | bool
+
+- name: Install xh
+  ansible.builtin.include_tasks: xh.yml
+  when: install_xh | bool
+
+- name: Install atuin
+  ansible.builtin.include_tasks: atuin.yml
+  when: install_atuin | bool

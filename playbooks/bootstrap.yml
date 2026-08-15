@@ -1,0 +1,29 @@
+---
+- name: Bootstrap productivity CLI tooling
+  hosts: all
+  gather_facts: true
+  become: true
+
+  pre_tasks:
+    - name: Assert Debian/Ubuntu family
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == "Debian"
+        fail_msg: >-
+          dev-bootstrap currently supports Debian/Ubuntu only
+          (got {{ ansible_os_family }}).
+
+    - name: Load passwd database for target user
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ bootstrap_user }}"
+
+    - name: Set bootstrap_home from getent
+      ansible.builtin.set_fact:
+        bootstrap_home: "{{ ansible_facts.getent_passwd[bootstrap_user][4] }}"
+
+  roles:
+    - role: cli_tools
+    - role: starship
+      when: install_starship | bool
+    - role: common_shell

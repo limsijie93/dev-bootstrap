@@ -1,0 +1,45 @@
+---
+- name: Ensure xh extract directory exists
+  ansible.builtin.file:
+    path: /tmp/xh_extract
+    state: directory
+    mode: "0755"
+
+- name: Download xh archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/ducaale/xh/releases/download/v{{ xh_version }}/xh-v{{ xh_version }}-{{ cli_arch_gnu }}-unknown-linux-musl.tar.gz
+    dest: /tmp/xh.tar.gz
+    mode: "0644"
+
+- name: Unpack xh archive
+  ansible.builtin.unarchive:
+    src: /tmp/xh.tar.gz
+    dest: /tmp/xh_extract
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+
+- name: Install xh binary
+  ansible.builtin.copy:
+    src: /tmp/xh_extract/xh
+    dest: "{{ cli_install_dir }}/xh"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Symlink xh to https (optional httpie-style alias)
+  ansible.builtin.file:
+    src: "{{ cli_install_dir }}/xh"
+    dest: "{{ cli_install_dir }}/https"
+    state: link
+    force: true
+
+- name: Cleanup xh temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/xh.tar.gz
+    - /tmp/xh_extract

@@ -1,0 +1,35 @@
+---
+- name: Build apt package list from feature flags
+  ansible.builtin.set_fact:
+    cli_apt_packages: >-
+      {{
+        (['fzf'] if install_fzf | bool else [])
+        + (['bat'] if install_bat | bool else [])
+        + (['ripgrep'] if install_ripgrep | bool else [])
+        + (['fd-find'] if install_fd | bool else [])
+        + (['jq'] if install_jq | bool else [])
+        + (['tmux'] if install_tmux | bool else [])
+        + (['direnv'] if install_direnv | bool else [])
+      }}
+
+- name: Install apt CLI packages
+  ansible.builtin.apt:
+    name: "{{ cli_apt_packages }}"
+    state: present
+  when: cli_apt_packages | length > 0
+
+- name: Symlink batcat to bat
+  ansible.builtin.file:
+    src: /usr/bin/batcat
+    dest: "{{ cli_install_dir }}/bat"
+    state: link
+    force: true
+  when: install_bat | bool
+
+- name: Symlink fdfind to fd
+  ansible.builtin.file:
+    src: /usr/bin/fdfind
+    dest: "{{ cli_install_dir }}/fd"
+    state: link
+    force: true
+  when: install_fd | bool

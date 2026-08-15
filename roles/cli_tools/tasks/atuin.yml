@@ -1,0 +1,38 @@
+---
+- name: Ensure atuin extract directory exists
+  ansible.builtin.file:
+    path: /tmp/atuin_extract
+    state: directory
+    mode: "0755"
+
+- name: Download atuin archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/atuinsh/atuin/releases/download/v{{ atuin_version }}/atuin-{{ cli_arch_gnu }}-unknown-linux-gnu.tar.gz
+    dest: /tmp/atuin.tar.gz
+    mode: "0644"
+
+- name: Unpack atuin archive
+  ansible.builtin.unarchive:
+    src: /tmp/atuin.tar.gz
+    dest: /tmp/atuin_extract
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+
+- name: Install atuin binary
+  ansible.builtin.copy:
+    src: /tmp/atuin_extract/atuin
+    dest: "{{ cli_install_dir }}/atuin"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup atuin temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/atuin.tar.gz
+    - /tmp/atuin_extract

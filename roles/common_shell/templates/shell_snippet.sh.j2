@@ -1,0 +1,48 @@
+# Productivity tooling — managed by dev-bootstrap
+export PATH="{{ cli_install_dir }}:$PATH"
+
+{% if install_eza | bool %}
+alias ls='eza --group-directories-first --icons=auto'
+alias ll='eza -lah --group-directories-first --icons=auto --git'
+alias tree='eza --tree --icons=auto'
+{% endif %}
+
+{% if install_bat | bool %}
+alias cat='bat --paging=never'
+export BAT_THEME="${BAT_THEME:-ansi}"
+{% endif %}
+
+{% if install_zoxide | bool %}
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init {{ shell_name }})"
+fi
+{% endif %}
+
+{% if install_fzf | bool %}
+if command -v fzf >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='{% if install_fd | bool %}fd --type f --hidden --follow --exclude .git{% else %}find . -type f{% endif %}'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+{% endif %}
+
+{% if install_delta | bool %}
+export GIT_PAGER="${GIT_PAGER:-delta}"
+{% endif %}
+
+{% if install_direnv | bool %}
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook {{ shell_name }})"
+fi
+{% endif %}
+
+{% if install_atuin | bool %}
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init {{ shell_name }})"
+fi
+{% endif %}
+
+{% if install_starship | bool %}
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init {{ shell_name }})"
+fi
+{% endif %}

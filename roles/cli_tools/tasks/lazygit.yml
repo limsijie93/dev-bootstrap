@@ -1,0 +1,36 @@
+---
+- name: Ensure lazygit extract directory exists
+  ansible.builtin.file:
+    path: /tmp/lazygit_extract
+    state: directory
+    mode: "0755"
+
+- name: Download lazygit archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_{{ cli_arch_asset }}.tar.gz
+    dest: /tmp/lazygit.tar.gz
+    mode: "0644"
+
+- name: Unpack lazygit archive
+  ansible.builtin.unarchive:
+    src: /tmp/lazygit.tar.gz
+    dest: /tmp/lazygit_extract
+    remote_src: true
+
+- name: Install lazygit binary
+  ansible.builtin.copy:
+    src: /tmp/lazygit_extract/lazygit
+    dest: "{{ cli_install_dir }}/lazygit"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup lazygit temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/lazygit.tar.gz
+    - /tmp/lazygit_extract

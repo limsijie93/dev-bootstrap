@@ -1,0 +1,36 @@
+---
+- name: Ensure btop extract directory exists
+  ansible.builtin.file:
+    path: /tmp/btop_extract
+    state: directory
+    mode: "0755"
+
+- name: Download btop archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/aristocratos/btop/releases/download/v{{ btop_version }}/btop-{{ cli_arch_gnu }}-linux-musl.tbz
+    dest: /tmp/btop.tbz
+    mode: "0644"
+
+- name: Unpack btop archive
+  ansible.builtin.unarchive:
+    src: /tmp/btop.tbz
+    dest: /tmp/btop_extract
+    remote_src: true
+
+- name: Install btop binary
+  ansible.builtin.copy:
+    src: /tmp/btop_extract/btop/bin/btop
+    dest: "{{ cli_install_dir }}/btop"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup btop temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/btop.tbz
+    - /tmp/btop_extract
