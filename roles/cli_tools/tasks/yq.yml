@@ -1,0 +1,10 @@
+---
+- name: Download yq binary
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/mikefarah/yq/releases/download/v{{ yq_version }}/yq_linux_{{ cli_arch_go }}
+    dest: "{{ cli_install_dir }}/yq"
+    mode: "0755"
+    owner: root
+    group: root
+    force: true

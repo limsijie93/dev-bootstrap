@@ -1,0 +1,36 @@
+---
+- name: Ensure eza extract directory exists
+  ansible.builtin.file:
+    path: /tmp/eza_extract
+    state: directory
+    mode: "0755"
+
+- name: Download eza archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/eza-community/eza/releases/download/v{{ eza_version }}/eza_{{ cli_arch_gnu }}-unknown-linux-gnu.tar.gz
+    dest: /tmp/eza.tar.gz
+    mode: "0644"
+
+- name: Unpack eza archive
+  ansible.builtin.unarchive:
+    src: /tmp/eza.tar.gz
+    dest: /tmp/eza_extract
+    remote_src: true
+
+- name: Install eza binary
+  ansible.builtin.copy:
+    src: /tmp/eza_extract/eza
+    dest: "{{ cli_install_dir }}/eza"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup eza temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/eza.tar.gz
+    - /tmp/eza_extract

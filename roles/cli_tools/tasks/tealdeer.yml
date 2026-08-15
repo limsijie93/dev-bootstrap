@@ -1,0 +1,10 @@
+---
+- name: Download tealdeer binary
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/tealdeer-rs/tealdeer/releases/download/v{{ tealdeer_version }}/tealdeer-linux-{{ 'x86_64-musl' if ansible_architecture == 'x86_64' else 'aarch64-musl' }}
+    dest: "{{ cli_install_dir }}/tldr"
+    mode: "0755"
+    owner: root
+    group: root
+    force: true

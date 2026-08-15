@@ -1,0 +1,46 @@
+---
+# Target user for shell config (connecting user by default)
+bootstrap_user: "{{ ansible_user_id }}"
+
+# System-wide install location
+cli_install_dir: /usr/local/bin
+
+# Architecture helpers for GitHub release assets
+cli_arch_gnu: "{{ 'x86_64' if ansible_architecture == 'x86_64' else 'aarch64' }}"
+cli_arch_go: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+cli_arch_asset: "{{ 'x86_64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+
+# Feature flags — set false on slim hosts to skip a tool
+install_fzf: true
+install_bat: true
+install_eza: true
+install_starship: true
+install_ripgrep: true
+install_fd: true
+install_zoxide: true
+install_delta: true
+install_jq: true
+install_yq: true
+install_btop: true
+install_tmux: true
+install_lazygit: true
+install_duf: true
+install_dust: true
+install_tealdeer: true
+install_xh: true
+install_direnv: true
+install_atuin: false
+
+# Pinned versions for GitHub release installs (bump deliberately)
+eza_version: "0.21.0"
+starship_version: "1.23.0"
+zoxide_version: "0.9.7"
+delta_version: "0.18.2"
+yq_version: "4.45.1"
+btop_version: "1.4.0"
+lazygit_version: "0.48.0"
+duf_version: "0.8.1"
+dust_version: "1.1.1"
+tealdeer_version: "1.7.1"
+xh_version: "0.24.0"
+atuin_version: "18.4.0"

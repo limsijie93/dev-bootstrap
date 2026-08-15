@@ -1,0 +1,36 @@
+---
+- name: Download zoxide archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/ajeetdsouza/zoxide/releases/download/v{{ zoxide_version }}/zoxide-{{ zoxide_version }}-{{ cli_arch_gnu }}-unknown-linux-musl.tar.gz
+    dest: /tmp/zoxide.tar.gz
+    mode: "0644"
+
+- name: Ensure zoxide extract directory exists
+  ansible.builtin.file:
+    path: /tmp/zoxide_extract
+    state: directory
+    mode: "0755"
+
+- name: Unpack zoxide archive
+  ansible.builtin.unarchive:
+    src: /tmp/zoxide.tar.gz
+    dest: /tmp/zoxide_extract
+    remote_src: true
+
+- name: Install zoxide binary
+  ansible.builtin.copy:
+    src: /tmp/zoxide_extract/zoxide
+    dest: "{{ cli_install_dir }}/zoxide"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cleanup zoxide temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/zoxide.tar.gz
+    - /tmp/zoxide_extract

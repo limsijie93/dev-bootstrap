@@ -1,0 +1,5 @@
+---
+# Kept for role isolation; prefer group_vars/all.yml values when present
+cli_arch_gnu: "{{ 'x86_64' if ansible_architecture == 'x86_64' else 'aarch64' }}"
+cli_arch_go: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+cli_arch_asset: "{{ 'x86_64' if ansible_architecture == 'x86_64' else 'arm64' }}"

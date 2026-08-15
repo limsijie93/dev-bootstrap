@@ -1,0 +1,52 @@
+---
+- name: Ensure starship extract directory exists
+  ansible.builtin.file:
+    path: /tmp/starship_extract
+    state: directory
+    mode: "0755"
+
+- name: Download starship archive
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/starship/starship/releases/download/v{{ starship_version }}/starship-{{ cli_arch_gnu }}-unknown-linux-gnu.tar.gz
+    dest: /tmp/starship.tar.gz
+    mode: "0644"
+
+- name: Unpack starship archive
+  ansible.builtin.unarchive:
+    src: /tmp/starship.tar.gz
+    dest: /tmp/starship_extract
+    remote_src: true
+
+- name: Install starship binary
+  ansible.builtin.copy:
+    src: /tmp/starship_extract/starship
+    dest: "{{ cli_install_dir }}/starship"
+    remote_src: true
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure starship config directory exists
+  ansible.builtin.file:
+    path: "{{ starship_config_dir }}"
+    state: directory
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0755"
+
+- name: Install starship config
+  ansible.builtin.template:
+    src: starship.toml.j2
+    dest: "{{ starship_config_path }}"
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0644"
+
+- name: Cleanup starship temp files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/starship.tar.gz
+    - /tmp/starship_extract
